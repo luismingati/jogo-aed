@@ -15,7 +15,7 @@
 int pontuacao = 0;
 pthread_mutex_t lock;
 char nomeJogador[20];
-
+int vidas = 2;
 typedef struct Node
 {
   int num;
@@ -43,8 +43,10 @@ void inserirHallDaFama(char nome[20], int pontuacao);
 void insertPlayer(Player **head, char nome[20], int pontuacao);
 void insertionSortPlayer(Player **head);
 void imprimirHallDaFama(Player *head);
-int compararResultado(Node *head, int qtd);
+int compararResultado(Node *head, Node *resposta);
 int buscarNumero(Node *head, int num);
+void scanearResposta(Node **resposta, int qtd);
+void insertAtEnd(Node **head, int num);
 
 int pontuacaoCount = 1;
 
@@ -54,6 +56,21 @@ void insert(Node **head, int num)
   new->num = num;
   new->next = *head;
   *head = new;
+}
+
+void insertAtEnd(Node **head, int num) {
+  Node *new = (Node *)malloc(sizeof(Node));
+  new->num = num;
+  new->next = NULL;
+  if (*head == NULL) {
+    *head = new;
+    return;
+  }
+  Node *aux = *head;
+  while (aux->next != NULL) {
+    aux = aux->next;
+  }
+  aux->next = new;
 }
 
 void imprimir(Node *head)
@@ -109,6 +126,7 @@ void menu()
   switch (opcao)
   {
   case 1:
+    vidas = 2;
     jogar();
     break;
   case 2:
@@ -187,7 +205,7 @@ void jogar()
   pthread_t thread_id;
   pthread_mutex_init(&lock, NULL);
   pthread_create(&thread_id, NULL, atualizaPontuacao, NULL);
-
+  Node *resposta = NULL;
   Node *head = NULL;
   int passou = 0;
   inicializar();
@@ -197,112 +215,163 @@ void jogar()
     int dificuldade = 1;
     gerarLista(quantidade, dificuldade, &head);
     imprimir(head);
+    scanearResposta(&resposta, quantidade);
+    imprimir(resposta);
     gerarResultado(&head);
-    if (compararResultado(head, quantidade))
+    if (compararResultado(head, resposta))
     {
       printf(ANSI_GREEN "Parabens, voce acertou! Agora vai ser um pouco mais difícil!\n" ANSI_RESET);
       passou = 1;
     }
     else
     {
-      printf(ANSI_RED "Voce errou, sorteando um novo array...\n" ANSI_RESET);
+      vidas--;
+      if (vidas == 0) {
+        printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+        break;
+      }
+      printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
       passou = 0;
     }
     printf("\n\n");
     freeList(&head);
+    freeList(&resposta);
   } while (passou == 0);
   passou = 0;
-  do
-  {
-    int quantidade = 6;
-    int dificuldade = 2;
-    gerarLista(quantidade, dificuldade, &head);
-    imprimir(head);
-    gerarResultado(&head);
-    if (compararResultado(head, quantidade))
-    {
-      printf(ANSI_GREEN "Parabens, voce acertou! Voce esta indo para o nivel 3.\n" ANSI_RESET);
-      passou = 1;
-    }
-    else
-    {
-      printf(ANSI_RED "Voce errou, sorteando um novo array...\n" ANSI_RESET);
-      passou = 0;
-    }
-    printf("\n\n");
-    freeList(&head);
-  } while (passou == 0);
-  passou = 0;
+  if(vidas > 0) {
 
-  do
-  {
-    int quantidade = 7;
-    int dificuldade = 3;
-    gerarLista(quantidade, dificuldade, &head);
-    imprimir(head);
-    gerarResultado(&head);
-    if (compararResultado(head, quantidade))
+    do
     {
-      printf(ANSI_GREEN "Parabens, voce acertou! Agora quero ver!\n" ANSI_RESET);
-      passou = 1;
-    }
-    else
-    {
-      printf(ANSI_RED "Voce errou, sorteando um novo array...\n" ANSI_RESET);
-      passou = 0;
-    }
-    printf("\n\n");
-    freeList(&head);
-  } while (passou == 0);
-  passou = 0;
+      int quantidade = 6;
+      int dificuldade = 2;
+      gerarLista(quantidade, dificuldade, &head);
+      imprimir(head);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! Voce esta indo para o nivel 3.\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0) {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
 
-  do
-  {
-    int quantidade = 8;
-    int dificuldade = 4;
-    gerarLista(quantidade, dificuldade, &head);
-    imprimir(head);
-    gerarResultado(&head);
-    if (compararResultado(head, quantidade))
-    {
-      printf(ANSI_GREEN "Parabens, voce acertou! So faltam mais dois!\n" ANSI_RESET);
-      passou = 1;
-    }
-    else
-    {
-      printf(ANSI_RED "Voce errou, sorteando um novo array...\n" ANSI_RESET);
-      passou = 0;
-    }
-    printf("\n\n");
-    freeList(&head);
-  } while (passou == 0);
+    } while (passou == 0);
+  }
   passou = 0;
+  if(vidas > 0) {
 
-  do
-  {
-    int quantidade = 9;
-    int dificuldade = 5;
-    gerarLista(quantidade, dificuldade, &head);
-    imprimir(head);
-    gerarResultado(&head);
-    if (compararResultado(head, quantidade))
+    do
     {
-      printf(ANSI_GREEN "Parabens, voce acertou! Voce conseguiu finalizar a Sorting Race!!!\n" ANSI_RESET);
-      passou = 1;
-    }
-    else
+      int quantidade = 7;
+      int dificuldade = 3;
+      gerarLista(quantidade, dificuldade, &head);
+      imprimir(head);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! Agora quero ver!\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0) {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
+  passou = 0;
+  if(vidas > 0) {
+
+    do
     {
-      printf(ANSI_RED "Voce errou, sorteando um novo array...\n" ANSI_RESET);
-      passou = 0;
-    }
-    printf("\n\n");
-    freeList(&head);
-  } while (passou == 0);
+      int quantidade = 8;
+      int dificuldade = 4;
+      gerarLista(quantidade, dificuldade, &head);
+      imprimir(head);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! So faltam mais dois!\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0) {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
+  passou = 0;
+  if(vidas > 0) {
+
+    do
+    {
+      int quantidade = 9;
+      int dificuldade = 5;
+      gerarLista(quantidade, dificuldade, &head);
+      imprimir(head);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! Voce conseguiu finalizar a Sorting Race!!!\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0) {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
   pontuacaoCount = 0;
   pthread_join(thread_id, NULL);
   pthread_mutex_destroy(&lock);
-  printf(ANSI_CYAN "Voce conseguiu fazer em %d segundos!\n" ANSI_RESET, pontuacao);
-  inserirHallDaFama(nomeJogador, pontuacao);
+  if(vidas > 0) {
+    printf(ANSI_CYAN "Voce conseguiu fazer em %d segundos!\n" ANSI_RESET, pontuacao);
+    inserirHallDaFama(nomeJogador, pontuacao);
+  }
   pontuacao = 0;
 }
 
@@ -402,17 +471,13 @@ void *atualizaPontuacao(void *vargp)
   return NULL;
 }
 
-int compararResultado(Node *head, int qtd)
-{
-  while (qtd--)
-  {
-    int num;
-    scanf("%d", &num);
-    if (head->num != num)
-    {
+int compararResultado(Node *head, Node *resposta) {
+  while (head != NULL && resposta != NULL) {
+    if (head->num != resposta->num) {
       return 0;
     }
     head = head->next;
+    resposta = resposta->next;
   }
   return 1;
 }
@@ -542,4 +607,14 @@ int buscarNumero(Node *head, int num)
     head = head->next;
   }
   return 0;
+}
+
+void scanearResposta(Node **resposta, int qtd)
+{
+  while (qtd--)
+  {
+    int num;
+    scanf("%d", &num);
+    insertAtEnd(resposta, num);
+  }
 }
