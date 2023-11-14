@@ -33,9 +33,10 @@ void menu();
 void creditos();
 void sair();
 void inicializar();
-void jogar();
+void jogarInteiros();
 void comoJogar();
-void gerarLista(int num, int dificuldade, Node **head);
+void jogarCaracteres();
+void gerarLista(int num, int dificuldade, Node **head, int mode);
 void gerarResultado(Node **head);
 void *atualizaPontuacao(void *vargp);
 void verHallDaFama();
@@ -47,54 +48,12 @@ int compararResultado(Node *head, Node *resposta);
 int buscarNumero(Node *head, int num);
 void scanearResposta(Node **resposta, int qtd);
 void insertAtEnd(Node **head, int num);
+void imprimir(Node *head, int mode);
+void freeList(Node **head);
+void insertAtEnd(Node **head, int num);
+void insert(Node **head, int num);
 
 int pontuacaoCount = 1;
-
-void insert(Node **head, int num)
-{
-  Node *new = (Node *)malloc(sizeof(Node));
-  new->num = num;
-  new->next = *head;
-  *head = new;
-}
-
-void insertAtEnd(Node **head, int num) {
-  Node *new = (Node *)malloc(sizeof(Node));
-  new->num = num;
-  new->next = NULL;
-  if (*head == NULL) {
-    *head = new;
-    return;
-  }
-  Node *aux = *head;
-  while (aux->next != NULL) {
-    aux = aux->next;
-  }
-  aux->next = new;
-}
-
-void imprimir(Node *head)
-{
-  Node *aux = head;
-  while (aux != NULL)
-  {
-    printf("%d ", aux->num);
-    aux = aux->next;
-  }
-  printf("\n");
-}
-
-void freeList(Node **head)
-{
-  Node *aux = *head;
-  while (aux != NULL)
-  {
-    Node *temp = aux;
-    aux = aux->next;
-    free(temp);
-  }
-  *head = NULL;
-}
 
 int main()
 {
@@ -116,6 +75,7 @@ void menu()
   printf("[4] - Creditos\n");
   printf(ANSI_RED "[5] - Sair\n" ANSI_RESET);
   int opcao;
+  int mode;
   scanf("%d", &opcao);
   while (opcao > 5 || opcao < 1)
   {
@@ -127,7 +87,18 @@ void menu()
   {
   case 1:
     vidas = 2;
-    jogar();
+    printf(ANSI_GREEN "Escolha o Modo de Jogo!!\n" ANSI_RESET);
+    printf("[1] - Ordenar Inteiros\n");
+    printf("[2] - Ordenar Caracteres\n");
+    scanf("%d", &mode);
+    if (mode == 1)
+    {
+      jogarInteiros();
+    }
+    if (mode == 2)
+    {
+      jogarCaracteres();
+    }
     break;
   case 2:
     verHallDaFama();
@@ -199,8 +170,9 @@ void inicializar()
   system("clear");
 }
 
-void jogar()
+void jogarInteiros()
 {
+  int mode = 1;
   pontuacaoCount = 1;
   pthread_t thread_id;
   pthread_mutex_init(&lock, NULL);
@@ -212,11 +184,10 @@ void jogar()
   do
   {
     int quantidade = 5;
-    int dificuldade = 1;
-    gerarLista(quantidade, dificuldade, &head);
-    imprimir(head);
+    int dificuldade = 2;
+    gerarLista(quantidade, dificuldade, &head, mode);
+    imprimir(head, mode);
     scanearResposta(&resposta, quantidade);
-    imprimir(resposta);
     gerarResultado(&head);
     if (compararResultado(head, resposta))
     {
@@ -226,8 +197,9 @@ void jogar()
     else
     {
       vidas--;
-      if (vidas == 0) {
-        printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+      if (vidas == 0)
+      {
+        printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
         break;
       }
       printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
@@ -238,14 +210,15 @@ void jogar()
     freeList(&resposta);
   } while (passou == 0);
   passou = 0;
-  if(vidas > 0) {
+  if (vidas > 0)
+  {
 
     do
     {
       int quantidade = 6;
-      int dificuldade = 2;
-      gerarLista(quantidade, dificuldade, &head);
-      imprimir(head);
+      int dificuldade = 10;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
       scanearResposta(&resposta, quantidade);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
@@ -256,8 +229,9 @@ void jogar()
       else
       {
         vidas--;
-        if (vidas == 0) {
-          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
           break;
         }
         printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
@@ -270,14 +244,15 @@ void jogar()
     } while (passou == 0);
   }
   passou = 0;
-  if(vidas > 0) {
+  if (vidas > 0)
+  {
 
     do
     {
       int quantidade = 7;
-      int dificuldade = 3;
-      gerarLista(quantidade, dificuldade, &head);
-      imprimir(head);
+      int dificuldade = 25;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
       scanearResposta(&resposta, quantidade);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
@@ -288,8 +263,9 @@ void jogar()
       else
       {
         vidas--;
-        if (vidas == 0) {
-          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
           break;
         }
         printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
@@ -302,14 +278,15 @@ void jogar()
     } while (passou == 0);
   }
   passou = 0;
-  if(vidas > 0) {
+  if (vidas > 0)
+  {
 
     do
     {
       int quantidade = 8;
-      int dificuldade = 4;
-      gerarLista(quantidade, dificuldade, &head);
-      imprimir(head);
+      int dificuldade = 50;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
       scanearResposta(&resposta, quantidade);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
@@ -320,8 +297,9 @@ void jogar()
       else
       {
         vidas--;
-        if (vidas == 0) {
-          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
           break;
         }
         printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
@@ -334,14 +312,15 @@ void jogar()
     } while (passou == 0);
   }
   passou = 0;
-  if(vidas > 0) {
+  if (vidas > 0)
+  {
 
     do
     {
       int quantidade = 9;
-      int dificuldade = 5;
-      gerarLista(quantidade, dificuldade, &head);
-      imprimir(head);
+      int dificuldade = 100;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
       scanearResposta(&resposta, quantidade);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
@@ -352,8 +331,9 @@ void jogar()
       else
       {
         vidas--;
-        if (vidas == 0) {
-          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET, vidas);
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
           break;
         }
         printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
@@ -368,60 +348,225 @@ void jogar()
   pontuacaoCount = 0;
   pthread_join(thread_id, NULL);
   pthread_mutex_destroy(&lock);
-  if(vidas > 0) {
+  if (vidas > 0)
+  {
     printf(ANSI_CYAN "Voce conseguiu fazer em %d segundos!\n" ANSI_RESET, pontuacao);
     inserirHallDaFama(nomeJogador, pontuacao);
   }
   pontuacao = 0;
 }
 
-void gerarLista(int num, int dificuldade, Node **head)
+void jogarCaracteres()
 {
-  while (num > 0)
-  {
-    int random;
-    if (dificuldade == 1)
-    {
-      do
-      {
-        random = rand() % 20;
-      } while (buscarNumero(*head, random));
+  int mode = 2;
+  pontuacaoCount = 1;
+  pthread_t thread_id;
+  pthread_mutex_init(&lock, NULL);
+  pthread_create(&thread_id, NULL, atualizaPontuacao, NULL);
+  Node *resposta = NULL;
+  Node *head = NULL;
+  int passou = 0;
 
-      insert(head, random);
-      num--;
-    }
-    else if (dificuldade == 2)
+  inicializar();
+
+  do
+  {
+    int quantidade = 5;
+    int dificuldade = 0;
+    gerarLista(quantidade, dificuldade, &head, mode);
+    imprimir(head, mode);
+    scanearResposta(&resposta, quantidade);
+    gerarResultado(&head);
+    if (compararResultado(head, resposta))
     {
+      printf(ANSI_GREEN "Parabens, voce acertou! Agora vai ser um pouco mais difícil!\n" ANSI_RESET);
+      passou = 1;
+    }
+    else
+    {
+      vidas--;
+      if (vidas == 0)
+      {
+        printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
+        break;
+      }
+      printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+      passou = 0;
+    }
+    printf("\n\n");
+    freeList(&head);
+    freeList(&resposta);
+  } while (passou == 0);
+  passou = 0;
+  if (vidas > 0)
+  {
+
+    do
+    {
+      int quantidade = 6;
+      int dificuldade = 0;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! Voce esta indo para o nivel 3.\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
+  passou = 0;
+  if (vidas > 0)
+  {
+
+    do
+    {
+      int quantidade = 7;
+      int dificuldade = 0;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! Agora quero ver!\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
+  passou = 0;
+  if (vidas > 0)
+  {
+
+    do
+    {
+      int quantidade = 8;
+      int dificuldade = 0;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! So faltam mais dois!\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
+  passou = 0;
+  if (vidas > 0)
+  {
+
+    do
+    {
+      int quantidade = 9;
+      int dificuldade = 0;
+      gerarLista(quantidade, dificuldade, &head, mode);
+      imprimir(head, mode);
+      scanearResposta(&resposta, quantidade);
+      gerarResultado(&head);
+      if (compararResultado(head, resposta))
+      {
+        printf(ANSI_GREEN "Parabens, voce acertou! Voce conseguiu finalizar a Sorting Race!!!\n" ANSI_RESET);
+        passou = 1;
+      }
+      else
+      {
+        vidas--;
+        if (vidas == 0)
+        {
+          printf(ANSI_RED "Você perdeu :(\nTente a sorte jogando novamente!" ANSI_RESET);
+          break;
+        }
+        printf(ANSI_RED "Voce errou, sorteando um novo array...\nVoce agora tem %d vida" ANSI_RESET, vidas);
+        passou = 0;
+      }
+      printf("\n\n");
+      freeList(&head);
+      freeList(&resposta);
+
+    } while (passou == 0);
+  }
+  pontuacaoCount = 0;
+  pthread_join(thread_id, NULL);
+  pthread_mutex_destroy(&lock);
+  if (vidas > 0)
+  {
+    printf(ANSI_CYAN "Voce conseguiu fazer em %d segundos!\n" ANSI_RESET, pontuacao);
+    inserirHallDaFama(nomeJogador, pontuacao);
+  }
+  pontuacao = 0;
+}
+
+void gerarLista(int num, int dificuldade, Node **head, int mode)
+{
+  if (mode == 1)
+  {
+    while (num > 0)
+    {
+      int random;
       do
       {
-        random = rand() % 100;
+        random = rand() % (10 * dificuldade);
       } while (buscarNumero(*head, random));
       insert(head, random);
       num--;
     }
-    else if (dificuldade == 3)
+  }
+  else if (mode == 2)
+  {
+    while (num > 0)
     {
+      int random;
       do
       {
-        random = rand() % 250;
-      } while (buscarNumero(*head, random));
-      insert(head, random);
-      num--;
-    }
-    else if (dificuldade == 4)
-    {
-      do
-      {
-        random = rand() % 500;
-      } while (buscarNumero(*head, random));
-      insert(head, random);
-      num--;
-    }
-    else if (dificuldade == 5)
-    {
-      do
-      {
-        random = rand() % 1000;
+        random = rand() % 26;
       } while (buscarNumero(*head, random));
       insert(head, random);
       num--;
@@ -471,9 +616,12 @@ void *atualizaPontuacao(void *vargp)
   return NULL;
 }
 
-int compararResultado(Node *head, Node *resposta) {
-  while (head != NULL && resposta != NULL) {
-    if (head->num != resposta->num) {
+int compararResultado(Node *head, Node *resposta)
+{
+  while (head != NULL && resposta != NULL)
+  {
+    if (head->num != resposta->num)
+    {
       return 0;
     }
     head = head->next;
@@ -617,4 +765,65 @@ void scanearResposta(Node **resposta, int qtd)
     scanf("%d", &num);
     insertAtEnd(resposta, num);
   }
+}
+
+void insertAtEnd(Node **head, int num)
+{
+  Node *new = (Node *)malloc(sizeof(Node));
+  new->num = num;
+  new->next = NULL;
+  if (*head == NULL)
+  {
+    *head = new;
+    return;
+  }
+  Node *aux = *head;
+  while (aux->next != NULL)
+  {
+    aux = aux->next;
+  }
+  aux->next = new;
+}
+
+void imprimir(Node *head, int mode)
+{
+  Node *aux = head;
+  if (mode == 1)
+  {
+    while (aux != NULL)
+    {
+      printf("%d ", aux->num);
+      aux = aux->next;
+    }
+    printf("\n");
+  }
+  else if (mode == 2)
+  {
+    while (aux != NULL)
+    {
+      printf("%c ", (aux->num + 97));
+      aux = aux->next;
+    }
+    printf("\n");
+  }
+}
+
+void freeList(Node **head)
+{
+  Node *aux = *head;
+  while (aux != NULL)
+  {
+    Node *temp = aux;
+    aux = aux->next;
+    free(temp);
+  }
+  *head = NULL;
+}
+
+void insert(Node **head, int num)
+{
+  Node *new = (Node *)malloc(sizeof(Node));
+  new->num = num;
+  new->next = *head;
+  *head = new;
 }
