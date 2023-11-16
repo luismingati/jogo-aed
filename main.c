@@ -26,6 +26,7 @@ typedef struct Player
 {
   int pontuacao;
   char nome[20];
+  char modo[20];
   struct Player *next;
 } Player;
 
@@ -40,13 +41,13 @@ void gerarLista(int num, int dificuldade, Node **head, int mode);
 void gerarResultado(Node **head);
 void *atualizaPontuacao(void *vargp);
 void verHallDaFama();
-void inserirHallDaFama(char nome[20], int pontuacao);
-void insertPlayer(Player **head, char nome[20], int pontuacao);
+void inserirHallDaFama(char nome[20], int pontuacao, int mode);
+void insertPlayer(Player **head, char nome[20], int pontuacao, char modo[20]);
 void insertionSortPlayer(Player **head);
 void imprimirHallDaFama(Player *head);
 int compararResultado(Node *head, Node *resposta);
 int buscarNumero(Node *head, int num);
-void scanearResposta(Node **resposta, int qtd);
+void scanearResposta(Node **resposta, int qtd, int mode);
 void insertAtEnd(Node **head, int num);
 void imprimir(Node *head, int mode);
 void freeList(Node **head);
@@ -187,7 +188,7 @@ void jogarInteiros()
     int dificuldade = 2;
     gerarLista(quantidade, dificuldade, &head, mode);
     imprimir(head, mode);
-    scanearResposta(&resposta, quantidade);
+    scanearResposta(&resposta, quantidade, mode);
     gerarResultado(&head);
     if (compararResultado(head, resposta))
     {
@@ -219,7 +220,7 @@ void jogarInteiros()
       int dificuldade = 10;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
+      scanearResposta(&resposta, quantidade, mode);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
@@ -253,7 +254,7 @@ void jogarInteiros()
       int dificuldade = 25;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
+      scanearResposta(&resposta, quantidade, mode);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
@@ -287,7 +288,7 @@ void jogarInteiros()
       int dificuldade = 50;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
+      scanearResposta(&resposta, quantidade, mode);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
@@ -321,7 +322,7 @@ void jogarInteiros()
       int dificuldade = 100;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
+      scanearResposta(&resposta, quantidade, mode);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
@@ -351,7 +352,7 @@ void jogarInteiros()
   if (vidas > 0)
   {
     printf(ANSI_CYAN "Voce conseguiu fazer em %d segundos!\n" ANSI_RESET, pontuacao);
-    inserirHallDaFama(nomeJogador, pontuacao);
+    inserirHallDaFama(nomeJogador, pontuacao, mode);
   }
   pontuacao = 0;
 }
@@ -375,8 +376,8 @@ void jogarCaracteres()
     int dificuldade = 0;
     gerarLista(quantidade, dificuldade, &head, mode);
     imprimir(head, mode);
-    scanearResposta(&resposta, quantidade);
     gerarResultado(&head);
+    scanearResposta(&resposta, quantidade, mode);
     if (compararResultado(head, resposta))
     {
       printf(ANSI_GREEN "Parabens, voce acertou! Agora vai ser um pouco mais difícil!\n" ANSI_RESET);
@@ -407,8 +408,8 @@ void jogarCaracteres()
       int dificuldade = 0;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
       gerarResultado(&head);
+      scanearResposta(&resposta, quantidade, mode);
       if (compararResultado(head, resposta))
       {
         printf(ANSI_GREEN "Parabens, voce acertou! Voce esta indo para o nivel 3.\n" ANSI_RESET);
@@ -441,8 +442,8 @@ void jogarCaracteres()
       int dificuldade = 0;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
       gerarResultado(&head);
+      scanearResposta(&resposta, quantidade, mode);
       if (compararResultado(head, resposta))
       {
         printf(ANSI_GREEN "Parabens, voce acertou! Agora quero ver!\n" ANSI_RESET);
@@ -475,7 +476,7 @@ void jogarCaracteres()
       int dificuldade = 0;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
+      scanearResposta(&resposta, quantidade, mode);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
@@ -509,7 +510,7 @@ void jogarCaracteres()
       int dificuldade = 0;
       gerarLista(quantidade, dificuldade, &head, mode);
       imprimir(head, mode);
-      scanearResposta(&resposta, quantidade);
+      scanearResposta(&resposta, quantidade, mode);
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
@@ -539,7 +540,7 @@ void jogarCaracteres()
   if (vidas > 0)
   {
     printf(ANSI_CYAN "Voce conseguiu fazer em %d segundos!\n" ANSI_RESET, pontuacao);
-    inserirHallDaFama(nomeJogador, pontuacao);
+    inserirHallDaFama(nomeJogador, pontuacao, mode);
   }
   pontuacao = 0;
 }
@@ -630,7 +631,7 @@ int compararResultado(Node *head, Node *resposta)
   return 1;
 }
 
-void inserirHallDaFama(char nome[20], int pontuacao)
+void inserirHallDaFama(char nome[20], int pontuacao, int mode)
 {
   FILE *arquivo = fopen("hallDaFama.txt", "a");
   if (arquivo == NULL)
@@ -638,7 +639,14 @@ void inserirHallDaFama(char nome[20], int pontuacao)
     perror("Erro ao abrir o arquivo");
     return;
   }
-  fprintf(arquivo, "%s %d\n", nome, pontuacao);
+  if (mode == 1)
+  {
+    fprintf(arquivo, "%s %d Int\n", nome, pontuacao);
+  }
+  else
+  {
+    fprintf(arquivo, "%s %d Char\n", nome, pontuacao);
+  }
   fclose(arquivo);
 }
 
@@ -647,13 +655,14 @@ void verHallDaFama()
   Player *head = NULL;
   system("clear");
   fflush(stdout);
-  printf(ANSI_BLUE "Nome - Menor Tempo\n\n" ANSI_RESET);
+  printf(ANSI_BLUE "Nome - Menor Tempo - Modo\n\n" ANSI_RESET);
   FILE *arquivo = fopen("hallDaFama.txt", "r");
   char nome[20];
   int pontuacao;
-  while (fscanf(arquivo, "%s %d", nome, &pontuacao) != EOF)
+  char modo[20];
+  while (fscanf(arquivo, "%s %d %s", nome, &pontuacao, modo) != EOF)
   {
-    insertPlayer(&head, nome, pontuacao);
+    insertPlayer(&head, nome, pontuacao, modo);
   }
   insertionSortPlayer(&head);
   imprimirHallDaFama(head);
@@ -694,11 +703,12 @@ void comoJogar()
   }
 }
 
-void insertPlayer(Player **head, char nome[20], int pontuacao)
+void insertPlayer(Player **head, char nome[20], int pontuacao, char modo[20])
 {
   Player *new = (Player *)malloc(sizeof(Player));
   new->pontuacao = pontuacao;
   strcpy(new->nome, nome);
+  strcpy(new->modo, modo);
   new->next = *head;
   *head = new;
 }
@@ -738,7 +748,7 @@ void imprimirHallDaFama(Player *head)
   Player *aux = head;
   while (aux != NULL)
   {
-    printf("%s - %d\n", aux->nome, aux->pontuacao);
+    printf("%s - %d - Modo %s\n", aux->nome, aux->pontuacao, aux->modo);
     aux = aux->next;
   }
   printf("\n");
@@ -757,13 +767,26 @@ int buscarNumero(Node *head, int num)
   return 0;
 }
 
-void scanearResposta(Node **resposta, int qtd)
+void scanearResposta(Node **resposta, int qtd, int mode)
 {
   while (qtd--)
   {
-    int num;
-    scanf("%d", &num);
-    insertAtEnd(resposta, num);
+    if (mode == 1)
+    {
+      int num;
+      scanf("%d", &num);
+      insertAtEnd(resposta, num);
+    }
+    else
+    {
+      char caractere;
+      do
+      {
+        scanf(" %c", &caractere);
+      } while (caractere == ' ' || caractere == '\n');
+      int num = caractere - 97;
+      insertAtEnd(resposta, num);
+    }
   }
 }
 
