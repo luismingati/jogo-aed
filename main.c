@@ -69,7 +69,7 @@ int main()
 
 void menu()
 {
-  system("clear");
+  system("cls");
   printf(ANSI_GREEN "[1] - Jogar\n" ANSI_RESET);
   printf("[2] - Hall da Fama\n");
   printf("[3] - Como Jogar\n");
@@ -118,7 +118,7 @@ void menu()
 
 void creditos()
 {
-  system("clear");
+  system("cls");
   printf("Feito por:\n");
   printf(ANSI_CYAN "Luís Otávio Mingati e Pedro Henrique Andriotti\n" ANSI_RESET);
   printf("Turma 3A de CC\n");
@@ -151,7 +151,7 @@ void sair()
 
 void inicializar()
 {
-  system("clear");
+  system("cls");
 
   printf("Digite seu primeiro nome: ");
 
@@ -162,13 +162,13 @@ void inicializar()
 
   for (int i = 3; i > 0; i--)
   {
-    system("clear");
+    system("cls");
     printf("%d...", i);
     fflush(stdout);
     sleep(1);
   }
 
-  system("clear");
+  system("cls");
 }
 
 void jogarInteiros()
@@ -292,7 +292,7 @@ void jogarInteiros()
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
-        printf(ANSI_GREEN "Parabens, voce acertou! So faltam mais dois!\n" ANSI_RESET);
+        printf(ANSI_GREEN "Parabens, voce acertou! So falta mais um!\n" ANSI_RESET);
         passou = 1;
       }
       else
@@ -480,7 +480,7 @@ void jogarCaracteres()
       gerarResultado(&head);
       if (compararResultado(head, resposta))
       {
-        printf(ANSI_GREEN "Parabens, voce acertou! So faltam mais dois!\n" ANSI_RESET);
+        printf(ANSI_GREEN "Parabens, voce acertou! So falta mais um!\n" ANSI_RESET);
         passou = 1;
       }
       else
@@ -653,7 +653,7 @@ void inserirHallDaFama(char nome[20], int pontuacao, int mode)
 void verHallDaFama()
 {
   Player *head = NULL;
-  system("clear");
+  system("cls");
   fflush(stdout);
   printf(ANSI_BLUE "Nome - Menor Tempo - Modo\n\n" ANSI_RESET);
   FILE *arquivo = fopen("hallDaFama.txt", "r");
@@ -682,7 +682,7 @@ void verHallDaFama()
 
 void comoJogar()
 {
-  system("clear");
+  system("cls");
   fflush(stdout);
   printf(ANSI_GREEN "Sort Race e um jogo de raciocínio rapido.\n" ANSI_RESET);
   printf("O objetivo e reescrever o array gerado aleatoriamente em ordem crescente.\n");

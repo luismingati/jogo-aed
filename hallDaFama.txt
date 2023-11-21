@@ -1,11 +1,3 @@
-PedroViadao 123 Int
-Luis 10 Int
-Luizot 60 Int
-Luizotdois 71 Int
-PEDRO 123 Int
-Luis 245 Int
-LuizotMangot 122 Int
-oi 174 Int
-AGORASOUEU 111 Int
-PEDROCARAC 145 Char
-pedroint 80 Int
+Luis 150 Int
+Pedro 150 Char
+Natacha 283 Char
